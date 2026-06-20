@@ -4,6 +4,7 @@ Tests for Prometheus Skill Ecosystem.
 
 import pytest
 from pathlib import Path
+from prometheus.core import ContextEngine, ContextConfig
 from prometheus.skill import SkillLoader, SkillRegistry, SkillMeta, Skill
 
 
@@ -120,9 +121,19 @@ Skill 2 content.
 class TestSkillRegistry:
     """Test skill registry operations."""
 
-    def test_register_and_find(self):
+    @pytest.fixture
+    def engine(self):
+        """Create a ContextEngine for SkillRegistry."""
+        config = ContextConfig()
+        return ContextEngine(config)
+
+    @pytest.fixture
+    def registry(self, engine):
+        """Create a SkillRegistry with engine."""
+        return SkillRegistry(engine)
+
+    def test_register_and_find(self, registry):
         """Test registering and finding skills."""
-        registry = SkillRegistry()
 
         skill = Skill(
             meta=SkillMeta(
@@ -140,9 +151,8 @@ class TestSkillRegistry:
         assert len(found) == 1
         assert found[0].meta.name == "test-skill"
 
-    def test_find_by_tag(self):
+    def test_find_by_tag(self, registry):
         """Test finding skills by tag."""
-        registry = SkillRegistry()
 
         for i in range(3):
             skill = Skill(
@@ -163,9 +173,8 @@ class TestSkillRegistry:
         advanced_skills = registry.find_by_tag("advanced")
         assert len(advanced_skills) == 1
 
-    def test_suggest_skills(self):
+    def test_suggest_skills(self, registry):
         """Test skill suggestion."""
-        registry = SkillRegistry()
 
         # Register skills with different descriptions
         skills_data = [
@@ -190,9 +199,8 @@ class TestSkillRegistry:
         if suggestions:
             assert "code-review" in [s.id for s in suggestions]
 
-    def test_dependency_resolution(self):
+    def test_dependency_resolution(self, registry):
         """Test resolving skill dependencies."""
-        registry = SkillRegistry()
 
         # Create a dependency chain: base -> mid -> top
         base = Skill(
@@ -219,9 +227,8 @@ class TestSkillRegistry:
         assert "base" in dep_names
         assert "mid" in dep_names
 
-    def test_get_full_prompt(self):
+    def test_get_full_prompt(self, registry):
         """Test generating the full skill prompt."""
-        registry = SkillRegistry()
 
         skill = Skill(
             meta=SkillMeta(
@@ -239,9 +246,8 @@ class TestSkillRegistry:
         assert "helper" in prompt
         assert "helpful assistant" in prompt.lower()
 
-    def test_list_all(self):
+    def test_list_all(self, registry):
         """Test listing all skills."""
-        registry = SkillRegistry()
 
         for i in range(5):
             skill = Skill(
