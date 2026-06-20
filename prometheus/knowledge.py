@@ -20,6 +20,7 @@ import json
 import logging
 import re
 import time
+import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -56,7 +57,7 @@ class GraphConfig(BaseModel):
 
 class Entity(BaseModel):
     """A knowledge graph entity (node)."""
-    id: str = Field(default_factory=lambda: hashlib.sha256(str(time.time_ns()).encode()).hexdigest()[:16])
+    id: str = Field(default_factory=lambda: str(uuid.uuid4())[:16])
     name: str
     entity_type: str = "concept"  # concept, person, organization, location, event, artifact, code_entity
     description: str = ""

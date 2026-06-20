@@ -64,7 +64,7 @@ class TestMemoryLayer:
         await memory.remember("API key is abc-def-ghi", memory_type="fact", tags=["security", "api"], importance=1.0)
         await memory.remember("Server is on AWS us-east-1", memory_type="fact", tags=["infra", "aws"], importance=0.5)
 
-        security_memories = await memory.recall("security", memory_type="fact")
+        security_memories = await memory.recall("", tags=["security"], memory_type="fact")
         assert len(security_memories) >= 2
 
     @pytest.mark.asyncio
@@ -90,7 +90,7 @@ class TestMemoryLayer:
         await memory.initialize()
 
         entry = await memory.remember("Old info", memory_type="fact", importance=0.3)
-        await memory.improve(entry.id, "Updated info with more details", importance=0.9)
+        await memory.improve(entry.id, {"content": "Updated info with more details", "importance": 0.9})
 
         # Recall and verify
         results = await memory.recall("Updated info")

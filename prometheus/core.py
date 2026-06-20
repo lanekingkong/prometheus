@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import time
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -50,7 +51,7 @@ class ContextSource(BaseModel):
 
 class ContextEntry(BaseModel):
     """A single governed context entry with provenance."""
-    id: str = Field(default_factory=lambda: hashlib.sha256(str(time.time_ns()).encode()).hexdigest()[:12])
+    id: str = Field(default_factory=lambda: str(uuid.uuid4())[:12])
     key: str
     value: Any
     source: Optional[ContextSource] = None
@@ -294,12 +295,14 @@ class ContextEngine:
             existing.confidence = confidence
             if tags:
                 existing.tags = tags
-            self.governor.record_change("update", existing)
+            if hasattr(self, 'governor') and self.governor:
+                self.governor.record_change("update", existing)
             return existing
 
         entry = ContextEntry(key=key, value=value, source=source, tags=tags or [], confidence=confidence)
         self.store[entry.id] = entry
-        self.governor.record_change("create", entry)
+        if hasattr(self, 'governor') and self.governor:
+            self.governor.record_change("create", entry)
         return entry
 
     def get(self, key: str) -> Optional[Any]:
@@ -315,10 +318,15 @@ class ContextEngine:
         """Delete a context entry."""
         entry = self._find_by_key(key)
         if entry:
-            self.governor.record_change("delete", entry)
+            if hasattr(self, 'governor') and self.governor:
+                self.governor.record_change("delete", entry)
             del self.store[entry.id]
             return True
         return False
+
+    def remove(self, key: str) -> bool:
+        """Alias for delete()."""
+        return self.delete(key)
 
     def list(self, tag: Optional[str] = None) -> List[ContextEntry]:
         """List context entries, optionally filtered by tag."""

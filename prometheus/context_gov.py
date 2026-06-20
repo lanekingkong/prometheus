@@ -171,6 +171,10 @@ class ContextGovernor:
                       previous_value: Any = None, source: str = "",
                       metadata: Optional[Dict] = None):
         """Record a context change in the audit log."""
+        # Normalize change_type to enum
+        if isinstance(change_type, str):
+            change_type = ChangeType(change_type)
+
         # Check policies
         violations = self.check_policy(entry, change_type)
 

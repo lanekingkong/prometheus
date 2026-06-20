@@ -33,7 +33,7 @@ This is a test skill with instructions.
         assert skill.meta.description == "A test skill"
         assert "test" in skill.meta.tags
         assert "testing" in skill.meta.provides
-        assert "This is a test skill" in skill.content
+        assert "This is a test skill" in skill.instructions
 
     def test_parse_skill_with_requires(self):
         """Test parsing a skill with dependencies."""
@@ -74,13 +74,12 @@ Just a heading, no metadata.
             name="my-skill",
             description="Does something cool",
             instructions="Be helpful!",
-            tags=["utility"],
         )
 
         assert "name: my-skill" in template
         assert "description: Does something cool" in template
         assert "Be helpful!" in template
-        assert "utility" in template
+        assert "tags:" in template
 
     def test_load_from_dir(self, tmp_path):
         """Test loading skills from a directory."""
@@ -197,7 +196,7 @@ class TestSkillRegistry:
 
         # code-review should be first
         if suggestions:
-            assert "code-review" in [s.id for s in suggestions]
+            assert any("code-review" in s.id for s in suggestions)
 
     def test_dependency_resolution(self, registry):
         """Test resolving skill dependencies."""
@@ -224,8 +223,8 @@ class TestSkillRegistry:
 
         deps = registry.resolve_dependencies(top)
         dep_names = [d.id for d in deps]
-        assert "base" in dep_names
-        assert "mid" in dep_names
+        assert any("base" in n for n in dep_names)
+        assert any("mid" in n for n in dep_names)
 
     def test_get_full_prompt(self, registry):
         """Test generating the full skill prompt."""

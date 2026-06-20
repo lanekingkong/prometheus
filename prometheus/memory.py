@@ -21,6 +21,7 @@ import hashlib
 import json
 import logging
 import time
+import uuid
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -61,7 +62,7 @@ class MemoryConfig(BaseModel):
 
 class MemoryEntry(BaseModel):
     """A single memory entry with metadata."""
-    id: str = Field(default_factory=lambda: hashlib.sha256(str(time.time_ns()).encode()).hexdigest()[:16])
+    id: str = Field(default_factory=lambda: str(uuid.uuid4())[:16])
     content: str
     memory_type: str = "fact"  # fact, event, preference, skill, relationship
     source: str = "user"
@@ -248,6 +249,10 @@ class MemoryLayer:
 
         # Embedding function (pluggable)
         self._embed_fn: Optional[callable] = None
+
+    async def initialize(self):
+        """Initialize the memory layer (no-op for in-memory backend)."""
+        pass
 
     # ============================================================
     # Core API: remember()

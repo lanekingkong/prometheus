@@ -63,11 +63,14 @@ class TestContextEngine:
         engine = ContextEngine(config)
 
         source = ContextSource(name="test", source_type="inline")
-        engine.set("high_conf", "certain", source=source, confidence=1.0)
-        engine.set("low_conf", "maybe", source=source, confidence=0.2)
+        entry_high = engine.set("high_conf", "certain", source=source, confidence=1.0)
+        entry_low = engine.set("low_conf", "maybe", source=source, confidence=0.2)
 
-        assert engine.store["high_conf"].confidence == 1.0
-        assert engine.store["low_conf"].confidence == 0.2
+        entries = engine.list()
+        high = [e for e in entries if e.key == "high_conf"][0]
+        low = [e for e in entries if e.key == "low_conf"][0]
+        assert high.confidence == 1.0
+        assert low.confidence == 0.2
 
     def test_context_duplicate_update(self, tmp_path):
         """Test updating an existing context entry."""
@@ -106,7 +109,7 @@ class TestContextEngine:
             content="Hello from inline source",
         )
         engine.register_source(source)
-        assert "inline_source" in engine.sources
+        assert any(s.name == "inline_source" for s in engine.sources)
 
 
 class TestContextResolve:
