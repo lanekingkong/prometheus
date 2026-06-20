@@ -4,7 +4,7 @@ Tests for Prometheus Skill Ecosystem.
 
 import pytest
 from pathlib import Path
-from prometheus.skill import SkillLoader, SkillRegistry, SkillMeta, SkillObject
+from prometheus.skill import SkillLoader, SkillRegistry, SkillMeta, Skill
 
 
 class TestSkillLoader:
@@ -124,14 +124,14 @@ class TestSkillRegistry:
         """Test registering and finding skills."""
         registry = SkillRegistry()
 
-        skill = SkillObject(
+        skill = Skill(
             meta=SkillMeta(
                 name="test-skill",
                 version="1.0.0",
                 description="Test",
                 tags=["test"],
             ),
-            content="Test instructions",
+            instructions="Test instructions",
             source_path=Path("test/SKILL.md"),
         )
         registry.register(skill)
@@ -145,14 +145,14 @@ class TestSkillRegistry:
         registry = SkillRegistry()
 
         for i in range(3):
-            skill = SkillObject(
+            skill = Skill(
                 meta=SkillMeta(
                     name=f"skill-{i}",
                     version="1.0.0",
                     description="Test",
                     tags=["test"] if i < 2 else ["advanced"],
                 ),
-                content="Test",
+                instructions="Test",
                 source_path=Path(f"skill-{i}/SKILL.md"),
             )
             registry.register(skill)
@@ -175,9 +175,9 @@ class TestSkillRegistry:
         ]
 
         for name, desc, tags in skills_data:
-            skill = SkillObject(
+            skill = Skill(
                 meta=SkillMeta(name=name, version="1.0.0", description=desc, tags=tags),
-                content="Test",
+                instructions="Test",
                 source_path=Path(f"{name}/SKILL.md"),
             )
             registry.register(skill)
@@ -195,19 +195,19 @@ class TestSkillRegistry:
         registry = SkillRegistry()
 
         # Create a dependency chain: base -> mid -> top
-        base = SkillObject(
+        base = Skill(
             meta=SkillMeta(name="base", version="1.0.0", description="Base"),
-            content="Base",
+            instructions="Base",
             source_path=Path("base/SKILL.md"),
         )
-        mid = SkillObject(
+        mid = Skill(
             meta=SkillMeta(name="mid", version="1.0.0", description="Mid", requires=["base"]),
-            content="Mid",
+            instructions="Mid",
             source_path=Path("mid/SKILL.md"),
         )
-        top = SkillObject(
+        top = Skill(
             meta=SkillMeta(name="top", version="1.0.0", description="Top", requires=["mid", "base"]),
-            content="Top",
+            instructions="Top",
             source_path=Path("top/SKILL.md"),
         )
 
@@ -223,14 +223,14 @@ class TestSkillRegistry:
         """Test generating the full skill prompt."""
         registry = SkillRegistry()
 
-        skill = SkillObject(
+        skill = Skill(
             meta=SkillMeta(
                 name="helper",
                 version="1.0.0",
                 description="A helpful assistant skill",
                 tags=["help"],
             ),
-            content="You are a helpful assistant. Always be polite.",
+            instructions="You are a helpful assistant. Always be polite.",
             source_path=Path("helper/SKILL.md"),
         )
         registry.register(skill)
@@ -244,14 +244,14 @@ class TestSkillRegistry:
         registry = SkillRegistry()
 
         for i in range(5):
-            skill = SkillObject(
+            skill = Skill(
                 meta=SkillMeta(
                     name=f"skill-{i}",
                     version="1.0.0",
                     description=f"Skill {i}",
                     tags=["test"],
                 ),
-                content="Test",
+                instructions="Test",
                 source_path=Path(f"skill-{i}/SKILL.md"),
             )
             registry.register(skill)
