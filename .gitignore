@@ -1,0 +1,61 @@
+# Prometheus ContextOS
+
+# Build
+*.egg-info/
+dist/
+build/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+eggs/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# Workspace data
+.prometheus/
+workspace/
+*.context.yaml
+!prometheus.context.yaml
+
+# Memory data
+*.memory.db
+*.vector.db
+*.graph.db
+memory/
+
+# Logs
+*.log
+logs/
+
+# Secrets
+.env
+.env.local
+*.pem
+*.key
+credentials.json
+
+# OS
+Thumbs.db
+Desktop.ini
